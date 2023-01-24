@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "NftMarketplace",
+  "sourceName": "contracts/NtfMarketplace.sol",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220c095a620f03e0f9ed566e76fcca7e61220aed583f5749493078daf546d0d348964736f6c63430008070033",
+  "deployedBytecode": "0x6080604052600080fdfea2646970667358221220c095a620f03e0f9ed566e76fcca7e61220aed583f5749493078daf546d0d348964736f6c63430008070033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
