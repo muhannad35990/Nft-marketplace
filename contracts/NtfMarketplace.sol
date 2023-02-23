@@ -7,6 +7,8 @@ error NftMarketplace__PriceMustBeAboveZero();
 error NftMarketplace__NotApprovedForMarketplace();
 error NftMarketplace__AlreadyListed(address nftAddress, uint256 tokenId);
 error NftMarketplace__NotOwner();
+error NftMarketplace__NotListed(address nftAddress, uint256 tokenId);
+error NftMarketplace__PriceNotMet(address nftAddress, uint256 tokenId, uint256 price);
 
 contract NftMarketplace {
     struct Listing {
@@ -21,9 +23,18 @@ contract NftMarketplace {
         uint256 tokenId,
         uint256 price
     );
+    event ItemBought(
+        address indexed buyer,
+        address indexed nftAddress,
+        uint256 tokenId,
+        uint256 price
+    );
 
     //NFT Contract address ->NFT TokenID->Listing
+    // {nftAddress:{tokenId:{price,seller}}}
     mapping(address => mapping(uint256 => Listing)) private s_listings;
+    //seller address=>Amount earned
+    mapping(address => uint256) private s_proceeds;
 
     ////////
     //Modifires //
@@ -49,6 +60,14 @@ contract NftMarketplace {
         address owner = nft.ownerOf(tokenId);
         if (spender != owner) {
             revert NftMarketplace__NotOwner();
+        }
+        _;
+    }
+
+    modifier isListed(address nftAddress, uint256 tokenId) {
+        Listing memory listing = s_listings[nftAddress][tokenId];
+        if (listing.price <= 0) {
+            revert NftMarketplace__NotListed(nftAddress, tokenId);
         }
         _;
     }
@@ -82,6 +101,22 @@ contract NftMarketplace {
         //whenever update mapping emit an event (best practice)
         emit ItemListed(msg.sender, nftAddress, tokenId, price);
     }
-}
 
-// {nftAddress:{tokenId:{price,seller}}}
+    function buyItem(
+        address nftAddress,
+        uint256 tokenId
+    ) external payable isListed(nftAddress, tokenId) {
+        Listing memory listedItem = s_listings[nftAddress][tokenId];
+        if (msg.value < listedItem.price) {
+            revert NftMarketplace__PriceNotMet(nftAddress, tokenId, listedItem.price);
+        }
+
+        //shift the risk with working with money to the last step (pull over push)
+        s_proceeds[listedItem.seller] = s_proceeds[listedItem.seller] + msg.value;
+        delete (s_listings[nftAddress][tokenId]);
+        //send the nft is the last step to prevent re-entrancy attack
+        IERC721(nftAddress).safeTransferFrom(listedItem.seller, msg.sender, tokenId);
+
+        emit ItemBought(msg.sender, nftAddress, tokenId, listedItem.price);
+    }
+}
