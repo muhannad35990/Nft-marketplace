@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "E:\\Web development\\nft-marketplace\\contracts\\NtfMarketplace.sol": {
-      "lastModificationDate": 1677175115120,
-      "contentHash": "e368593d108173a497740bd28f85afa4",
+      "lastModificationDate": 1677183246578,
+      "contentHash": "976c72d18f05a7917913b2591d7cd9c2",
       "sourceName": "contracts/NtfMarketplace.sol",
       "solcConfig": {
         "version": "0.8.7",
