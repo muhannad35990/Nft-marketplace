@@ -30,12 +30,7 @@ contract NftMarketplace {
         uint256 price
     );
 
-        event ItemCanceled(
-        address indexed seller,
-        address indexed nftAddress,
-        uint256 tokenId
-    );
-
+    event ItemCanceled(address indexed seller, address indexed nftAddress, uint256 tokenId);
 
     //NFT Contract address ->NFT TokenID->Listing
     // {nftAddress:{tokenId:{price,seller}}}
@@ -132,6 +127,15 @@ contract NftMarketplace {
         uint256 tokenId
     ) external isOwner(nftAddress, tokenId, msg.sender) isListed(nftAddress, tokenId) {
         delete (s_listings[nftAddress][tokenId]);
-        emit ItemCanceled(msg.sender,nftAddress,tokenId)
+        emit ItemCanceled(msg.sender, nftAddress, tokenId);
+    }
+
+    function updateListing(
+        address nftAddress,
+        uint256 tokenId,
+        uint256 newPrice
+    ) external isOwner(nftAddress, tokenId, msg.sender) isListed(nftAddress, tokenId) {
+        s_listings[nftAddress][tokenId].price = newPrice;
+        emit ItemListed(msg.sender, nftAddress, tokenId, newPrice);
     }
 }
